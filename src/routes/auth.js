@@ -811,7 +811,10 @@ router.post(
       } = req.body;
 
       // Normalize phone number
-      phone = normalizePhoneNumber(phone);
+      console.log('[DEBUG] Incoming phone:', req.body.phone);
+phone = normalizePhoneNumber(req.body.phone);
+console.log('[DEBUG] Normalized phone:', phone);
+      // phone = normalizePhoneNumber(phone);
 
       // Check if user already exists
       const existingUser = await User.findOne({ phone });
