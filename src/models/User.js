@@ -23,6 +23,15 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  password: {
+    type: String,
+  },
+  securityQuestion: {
+    type: String,
+  },
+  securityAnswer: {
+    type: String,
+  },
   // Personal Details
   gender: String,
   aadhaar: String,
@@ -56,6 +65,17 @@ const userSchema = new mongoose.Schema({
   joinedDate: {
     type: Date,
     default: Date.now
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: false
+    },
+    coordinates: {
+      type: [Number],
+      required: false
+    }
   }
 }, {
   timestamps: true
@@ -63,5 +83,7 @@ const userSchema = new mongoose.Schema({
 
 // Index for phone number lookups
 userSchema.index({ phone: 1 });
+// Index for geospatial queries
+userSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('User', userSchema);

@@ -38,6 +38,26 @@ const generateToken = (userId, phone) => {
   };
 
 /**
+ * Generate a short-lived reset token
+ * @param {string} userId - User ID
+ * @param {string} phone - User phone number
+ * @returns {string} - JWT reset token
+ */
+const generateResetToken = (userId, phone) => {
+  const payload = {
+    userId,
+    phone,
+    isResetToken: true
+  };
+
+  const token = jwt.sign(payload, JWT_SECRET, {
+    expiresIn: '15m' // 15 minutes expiration for reset token
+  });
+
+  return token;
+};
+
+/**
  * Verify JWT token
  * @param {string} token - JWT token
  * @returns {object} - Decoded token payload
@@ -48,5 +68,6 @@ const verifyToken = (token) => {
 
 module.exports = {
   generateToken,
+  generateResetToken,
   verifyToken
 };

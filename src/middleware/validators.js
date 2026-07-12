@@ -84,6 +84,23 @@ const normalizePhone = (req, res, next) => {
 };
 
 /**
+ * Password strength validation
+ * Min 8 chars, 1 number, 1 special character
+ */
+const passwordValidationRules = () => {
+  return [
+    body('password')
+      .trim()
+      .notEmpty()
+      .withMessage('Password is required')
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters long')
+      .matches(/^(?=.*[0-9])(?=.*[!@#$%^&*])/)
+      .withMessage('Password must contain at least one number and one special character')
+  ];
+};
+
+/**
  * Validation rules for register user request
  */
 const registerUserValidation = [
@@ -93,6 +110,15 @@ const registerUserValidation = [
     .withMessage('Phone number is required')
     .matches(/^\+91[6-9]\d{9}$/)
     .withMessage('Invalid phone number format. Must be +91XXXXXXXXXX'),
+  ...passwordValidationRules(),
+  body('securityQuestion')
+    .trim()
+    .notEmpty()
+    .withMessage('Security question is required'),
+  body('securityAnswer')
+    .trim()
+    .notEmpty()
+    .withMessage('Security answer is required'),
   body('name')
     .trim()
     .notEmpty()
@@ -101,10 +127,73 @@ const registerUserValidation = [
     .withMessage('Name must be at least 2 characters'),
 ];
 
+/**
+ * Validation rules for login request
+ */
+const loginValidation = [
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('Phone number is required')
+    .matches(/^\+91[6-9]\d{9}$/)
+    .withMessage('Invalid phone number format. Must be +91XXXXXXXXXX'),
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('Password is required')
+];
+
+/**
+ * Validation for checking phone existence
+ */
+const checkPhoneValidation = [
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('Phone number is required')
+    .matches(/^(\+91)?[6-9]\d{9}$/)
+    .withMessage('Invalid Indian phone number.')
+];
+
+/**
+ * Validation for verify question
+ */
+const verifyQuestionValidation = [
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('Phone number is required')
+    .matches(/^\+91[6-9]\d{9}$/)
+    .withMessage('Invalid phone number format. Must be +91XXXXXXXXXX'),
+  body('securityAnswer')
+    .trim()
+    .notEmpty()
+    .withMessage('Security answer is required')
+];
+
+/**
+ * Validation for reset password
+ */
+const resetPasswordValidation = [
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('Phone number is required'),
+  body('resetToken')
+    .trim()
+    .notEmpty()
+    .withMessage('Reset token is required'),
+  ...passwordValidationRules(),
+];
+
 module.exports = {
   sendOtpValidation,
   verifyOtpValidation,
   registerUserValidation,
   handleValidationErrors,
-  normalizePhone
+  normalizePhone,
+  loginValidation,
+  checkPhoneValidation,
+  verifyQuestionValidation,
+  resetPasswordValidation
 };
