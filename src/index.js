@@ -25,10 +25,18 @@ app.use(cors());                        // Enable CORS for Flutter app
 app.use(express.json());                // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true }));
 
+// Import new routes
+const adminAuthRoutes = require('./routes/adminAuth');
+const adminRoutes = require('./routes/admin');
+const announcementsRoutes = require('./routes/announcements');
+
 // Routes
 app.use('/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/announcements', announcementsRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

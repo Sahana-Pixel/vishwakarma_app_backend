@@ -78,6 +78,83 @@ const authenticate = async (req, res, next) => {
   }
 };
 
+
+/**
+ * Middleware to authenticate JWT token for administrators
+ */
+const authenticateAdmin = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authorization token is required'
+      });
+    }
+
+    const parts = authHeader.split(' ');
+    if (parts.length !== 2 || parts[0] !== 'Bearer') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid authorization header format. Use: Bearer <token>'
+      });
+    }
+
+    const token = parts[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token is required'
+      });
+    }
+
+    try {
+      const decoded = verifyToken(token);
+      
+      // Ensure the role is admin
+      if (decoded.role !== 'admin') {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. Admin access only.'
+        });
+      }
+
+      req.admin = {
+        adminId: decoded.adminId,
+        email: decoded.email,
+        role: decoded.role
+      };
+
+      next();
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Token has expired. Please login again.'
+        });
+      }
+
+      if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid token'
+        });
+      }
+
+      throw error;
+    }
+  } catch (error) {
+    console.error('[ADMIN_AUTH] Authentication error:', error.message);
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication failed'
+    });
+  }
+};
+
 module.exports = {
-  authenticate
+  authenticate,
+  authenticateAdmin
 };

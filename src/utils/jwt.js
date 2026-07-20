@@ -66,8 +66,31 @@ const verifyToken = (token) => {
   return jwt.verify(token, JWT_SECRET);
 };
 
+/**
+ * Generate JWT token for admin
+ * @param {string} adminId - Admin ID
+ * @param {string} email - Admin email address
+ * @param {string} role - Admin role (default: admin)
+ * @returns {string} - JWT token
+ */
+const generateAdminToken = (adminId, email, role = 'admin') => {
+  const payload = {
+    adminId,
+    email,
+    role
+  };
+
+  const token = jwt.sign(payload, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN
+  });
+
+  console.log('[JWT] Generated token for admin:', adminId);
+  return token;
+};
+
 module.exports = {
   generateToken,
   generateResetToken,
+  generateAdminToken,
   verifyToken
 };
