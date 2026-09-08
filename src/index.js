@@ -21,6 +21,14 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // Middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
+  });
+  next();
+});
 app.use(cors());                        // Enable CORS for Flutter app
 app.use(express.json());                // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true }));

@@ -76,13 +76,60 @@ const userSchema = new mongoose.Schema({
       type: [Number],
       required: false
     }
+  },
+  locationName: {
+    type: String,
+    default: null
+  },
+  locationSource: {
+    type: String,
+    enum: ['gps', 'manual'],
+    default: null
+  },
+  isLocationVisible: {
+    type: Boolean,
+    default: true
+  },
+  professionDescription: {
+    type: String,
+    maxLength: 1000,
+    default: null
+  },
+  workImages: {
+    type: [{
+      url: String,
+      publicId: String,
+      uploadedAt: {
+        type: Date,
+        default: Date.now
+      },
+      order: {
+        type: Number,
+        required: true
+      },
+      isPrimary: {
+        type: Boolean,
+        default: false
+      }
+    }],
+    default: []
+  },
+  contributionOptions: {
+    type: [String],
+    default: []
+  },
+  contributionDescription: {
+    type: String,
+    default: null
+  },
+  contributionSubmittedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
 });
 
-// Index for phone number lookups
-userSchema.index({ phone: 1 });
 // Index for geospatial queries
 userSchema.index({ location: '2dsphere' });
 

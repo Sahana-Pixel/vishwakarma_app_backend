@@ -151,10 +151,12 @@ router.post(
   async (req, res, next) => {
     try {
       const { phone, password } = req.body;
+      console.log(`[LOGIN_ATTEMPT] Phone: ${phone}`);
 
       const user = await User.findOne({ phone });
 
       if (!user) {
+        console.warn(`[LOGIN_FAILED] Phone not registered: ${phone}`);
         return res.status(401).json({
           success: false,
           message: 'Invalid credentials'
@@ -163,6 +165,7 @@ router.post(
 
       // Soft migration support: If password doesn't exist, force password reset
       if (!user.password) {
+        console.warn(`[LOGIN_FAILED] User needs password reset: ${phone}`);
         return res.status(403).json({
           success: false,
           needsReset: true,
@@ -173,6 +176,7 @@ router.post(
       // Compare password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
+        console.warn(`[LOGIN_FAILED] Password mismatch for: ${phone}`);
         return res.status(401).json({
           success: false,
           message: 'Invalid credentials'
@@ -181,6 +185,7 @@ router.post(
 
       // Generate token
       const token = generateToken(user._id.toString(), phone);
+      console.log(`[LOGIN_SUCCESS] Generated token for: ${phone}`);
 
       return res.status(200).json({
         success: true,
